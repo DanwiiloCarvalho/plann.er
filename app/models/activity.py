@@ -1,8 +1,12 @@
 from app.db.base import Base
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import UUID, String, Date, Time, DateTime, ForeignKey, func
 from datetime import date, datetime, time
+from typing import TYPE_CHECKING
 import uuid
+
+if TYPE_CHECKING:
+    from app.models.trip import Trip
 
 
 class Activity(Base):
@@ -20,5 +24,5 @@ class Activity(Base):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), onupdate=func.now())
 
-    # trip: Mapped['Trip'] = relationship(
-    #     back_populates='activities', lazy='joined')
+    trip: Mapped['Trip'] = relationship(
+        back_populates='activities', lazy='joined')
