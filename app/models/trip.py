@@ -14,7 +14,6 @@ if TYPE_CHECKING:
 class Trip(Base):
     __tablename__ = 'trips'
 
-    id: Mapped[uuid.UUID] = mapped_column(UUID, primary_key=True)
     destination: Mapped[str] = mapped_column(String(100), nullable=False)
     start_date: Mapped[date] = mapped_column(Date, nullable=False)
     end_date: Mapped[date] = mapped_column(Date, nullable=False)
@@ -22,11 +21,6 @@ class Trip(Base):
     owner_email: Mapped[str] = mapped_column(String(200), nullable=False)
     status: Mapped[bool] = mapped_column(
         Boolean, nullable=False, default=False)
-
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime, server_default=func.now())
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime, server_default=func.now(), onupdate=func.now())
 
     activities: Mapped[list['Activity']] = relationship(
         back_populates='trip', lazy='joined', cascade='all, delete-orphan')
