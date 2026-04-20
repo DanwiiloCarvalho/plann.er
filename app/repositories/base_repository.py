@@ -1,0 +1,60 @@
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
+from app.db.base import Base
+from collections.abc import Sequence
+from typing import Any
+import uuid
+
+
+class BaseRepository[T: Base]:
+    def __init__(self, db_session: AsyncSession, model: type[T]) -> None:
+        self._db_session = db_session
+        self._model = model
+
+    async def create(self, obj_in: T) -> T:
+        self._db_session.add(obj_in)
+        await self._db_session.commit()
+
+        return obj_in
+
+    async def get_by_id(self, obj_id: uuid.UUID) -> T | None:
+        query = select(self._model).filter(self._model.id == obj_id)
+        result = await self._db_session.execute(query)
+        obj_found: T | None = result.unique().scalar_one_or_none()
+
+        return obj_found
+
+    async def list_all(self) -> list[T]:
+        query = select(self._model)
+        obj_sequence: Sequence[T] = (await self._db_session.execute(query)).unique().scalars().all()
+
+        return list(obj_sequence)
+
+    async def delete_by_id(self, obj_id: uuid.UUID) -> bool:
+        query = select(self._model).filter(self._model.id == obj_id)
+        result = await self._db_session.execute(query)
+        obj_found: T | None = result.unique().scalar_one_or_none()
+
+        if not obj_found:
+            return False
+
+        await self._db_session.delete(obj_found)
+        await self._db_session.commit()
+
+        return True
+
+    async def update(self, obj_id: uuid.UUID, obj_in: dict[str, Any]) -> T | None:
+        query = select(self._model).filter(self._model.id == obj_id)
+        result = await self._db_session.execute(query)
+        obj_found: T | None = result.unique().scalar_one_or_none()
+
+        if not obj_found:
+            return None
+
+        for key, value in obj_in.items():
+            setattr(obj_found, key, value)
+
+        await self._db_session.commit()
+        await self._db_session.refresh(obj_found)
+
+        return obj_found
