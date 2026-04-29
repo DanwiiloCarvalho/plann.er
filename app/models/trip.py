@@ -23,8 +23,8 @@ class Trip(Base):
         Boolean, nullable=False, default=False)
 
     activities: Mapped[list['Activity']] = relationship(
-        back_populates='trip', lazy='joined', cascade='all, delete-orphan')
+        back_populates='trip', lazy='selectin', cascade='all, delete-orphan')
     links: Mapped[list['Link']] = relationship(
-        back_populates='trip', lazy='joined', cascade='all, delete-orphan')
+        back_populates='trip', lazy='selectin', cascade='all, delete-orphan')
     emails_to_invite: Mapped[list['EmailToInvite']] = relationship(
-        back_populates='trip', lazy='joined', cascade='all, delete-orphan')
+        back_populates='trip', lazy='selectin', cascade='all, delete-orphan')
