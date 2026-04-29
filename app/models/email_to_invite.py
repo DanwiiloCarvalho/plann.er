@@ -20,4 +20,4 @@ class EmailToInvite(Base):
         ForeignKey('trips.id'), nullable=False)
 
     trip: Mapped['Trip'] = relationship(
-        back_populates='emails_to_invite', lazy='joined')
+        back_populates='emails_to_invite', lazy='select')

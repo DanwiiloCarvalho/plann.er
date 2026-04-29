@@ -19,4 +19,4 @@ class Activity(Base):
         ForeignKey('trips.id'), nullable=False)
 
     trip: Mapped['Trip'] = relationship(
-        back_populates='activities', lazy='joined')
+        back_populates='activities', lazy='select')
