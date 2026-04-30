@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 class EmailToInvite(Base):
     __tablename__ = 'emails_to_invite'
-    __table_args__ = UniqueConstraint('email', 'trip_id')
+    __table_args__ = (UniqueConstraint('email', 'trip_id', name='uq_emails_to_invite_email_trip_id'),)
 
     email: Mapped[str] = mapped_column(
         String(200), nullable=False)
