@@ -12,6 +12,7 @@ class Link(Base):
     __tablename__ = 'links'
 
     link: Mapped[str] = mapped_column(String(400), nullable=False)
+    title: Mapped[str] = mapped_column(String(100), nullable=False)
     trip_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey('trips.id'), nullable=False)
 
