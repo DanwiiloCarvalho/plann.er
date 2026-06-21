@@ -1,9 +1,9 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
-from app.models.activity import Activity
+from app.adapters.outbound.database.models.activity import Activity
 from collections.abc import Sequence
-from app.repositories.base_repository import BaseRepository
+from app.adapters.outbound.database.repositories.base_repository import BaseRepository
 from uuid import UUID
 
 

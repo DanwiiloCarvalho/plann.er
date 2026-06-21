@@ -3,8 +3,8 @@ from sqlalchemy import select
 from collections.abc import Sequence
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.exc import SQLAlchemyError
-from app.repositories.base_repository import BaseRepository
-from app.models.email_to_invite import EmailToInvite
+from app.adapters.outbound.database.repositories.base_repository import BaseRepository
+from app.adapters.outbound.database.models.email_to_invite import EmailToInvite
 from uuid import UUID
 
 

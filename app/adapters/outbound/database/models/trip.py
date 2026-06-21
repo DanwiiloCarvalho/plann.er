@@ -1,4 +1,4 @@
-from app.db.base import Base
+from app.adapters.outbound.database.models.base import Base
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import UUID, String, Date, Boolean, DateTime, func
 from datetime import date, datetime
@@ -6,9 +6,9 @@ from typing import TYPE_CHECKING
 import uuid
 
 if TYPE_CHECKING:
-    from app.models.activity import Activity
-    from app.models.email_to_invite import EmailToInvite
-    from app.models.link import Link
+    from app.adapters.outbound.database.models.activity import Activity
+    from app.adapters.outbound.database.models.email_to_invite import EmailToInvite
+    from app.adapters.outbound.database.models.link import Link
 
 
 class Trip(Base):

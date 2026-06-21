@@ -1,11 +1,11 @@
-from app.db.base import Base
+from app.adapters.outbound.database.models.base import Base
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import String, ForeignKey
 from typing import TYPE_CHECKING
 import uuid
 
 if TYPE_CHECKING:
-    from app.models.trip import Trip
+    from app.adapters.outbound.database.models.trip import Trip
 
 
 class Link(Base):

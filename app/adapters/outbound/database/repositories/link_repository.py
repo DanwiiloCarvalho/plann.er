@@ -2,8 +2,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 from collections.abc import Sequence
-from app.repositories.base_repository import BaseRepository
-from app.models.link import Link
+from app.adapters.outbound.database.repositories.base_repository import BaseRepository
+from app.adapters.outbound.database.models.link import Link
 from uuid import UUID
 
 

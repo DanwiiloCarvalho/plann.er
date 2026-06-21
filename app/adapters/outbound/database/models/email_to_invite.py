@@ -1,16 +1,17 @@
-from app.db.base import Base
+from app.adapters.outbound.database.models.base import Base
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import String, Boolean, ForeignKey, UniqueConstraint
 from typing import TYPE_CHECKING
 import uuid
 
 if TYPE_CHECKING:
-    from app.models.trip import Trip
+    from app.adapters.outbound.database.models.trip import Trip
 
 
 class EmailToInvite(Base):
     __tablename__ = 'emails_to_invite'
-    __table_args__ = (UniqueConstraint('email', 'trip_id', name='uq_emails_to_invite_email_trip_id'),)
+    __table_args__ = (UniqueConstraint('email', 'trip_id',
+                      name='uq_emails_to_invite_email_trip_id'),)
 
     email: Mapped[str] = mapped_column(
         String(200), nullable=False)

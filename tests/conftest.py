@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine, async_sessionmaker
-from app.core.config import settings
-from app.models import _all_models
+from app.infrastructure.config import settings
+from app.adapters.outbound.database.models import _all_models
 import pytest
 
 DATABASE_URL: str = str(settings.DATABASE_URL)

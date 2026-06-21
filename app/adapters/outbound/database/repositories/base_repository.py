@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from app.db.base import Base
+from app.adapters.outbound.database.models.base import Base
 from sqlalchemy.exc import SQLAlchemyError
 from collections.abc import Sequence
 from typing import Any
@@ -13,13 +13,9 @@ class BaseRepository[T: Base]:
         self._model = model
 
     async def create(self, obj_in: T) -> T:
-        try:
-            self._db_session.add(obj_in)
-            await self._db_session.commit()
-            return obj_in
-        except SQLAlchemyError as e:
-            await self._db_session.rollback()
-            raise e
+        self._db_session.add(obj_in)
+        await self._db_session.flush()
+        return obj_in
 
     async def get_by_id(self, obj_id: uuid.UUID) -> T | None:
         try:
