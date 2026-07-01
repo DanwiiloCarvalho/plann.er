@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from app.adapters.outbound.database.mappers.mapper import IMapper
+from app.adapters.outbound.database.mappers.imapper import IMapper
 from app.adapters.outbound.database.models.base import Base
 from sqlalchemy.exc import NoResultFound
 from collections.abc import Sequence
