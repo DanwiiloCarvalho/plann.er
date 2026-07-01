@@ -1,71 +1,68 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from app.adapters.outbound.database.mappers.mapper import IMapper
 from app.adapters.outbound.database.models.base import Base
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import NoResultFound
 from collections.abc import Sequence
-from typing import Any
+from abc import ABC
 import uuid
 
 
-class BaseRepository[T: Base]:
-    def __init__(self, db_session: AsyncSession, model: type[T]) -> None:
+class BaseRepository[OrmModel: Base, DomainEntity](ABC):
+    def __init__(
+        self,
+        db_session: AsyncSession,
+        model_cls: type[OrmModel],
+        mapper: type[IMapper[OrmModel, DomainEntity]]
+    ) -> None:
         self._db_session = db_session
-        self._model = model
+        self._model_cls = model_cls
+        self._mapper = mapper
 
-    async def create(self, obj_in: T) -> T:
-        self._db_session.add(obj_in)
+    async def create(self, obj_in: DomainEntity) -> DomainEntity:
+        self._db_session.add(self._mapper.to_model(obj_in))
         await self._db_session.flush()
         return obj_in
 
-    async def get_by_id(self, obj_id: uuid.UUID) -> T | None:
-        try:
-            query = select(self._model).filter(self._model.id == obj_id)
-            result = await self._db_session.execute(query)
-            obj_found: T | None = result.unique().scalar_one_or_none()
-            return obj_found
-        except SQLAlchemyError as e:
-            raise e
+    async def get_by_id(self, obj_id: uuid.UUID) -> DomainEntity | None:
+        query = select(self._model_cls).filter(self._model_cls.id == obj_id)
+        result = await self._db_session.execute(query)
+        obj_found: OrmModel | None = result.scalar_one_or_none()
 
-    async def list_all(self) -> list[T]:
-        try:
-            query = select(self._model)
-            result = await self._db_session.execute(query)
-            obj_sequence: Sequence[T] = result.unique().scalars().all()
-            return list(obj_sequence)
-        except SQLAlchemyError as e:
-            raise e
+        return self._mapper.to_domain(obj_found) if obj_found else None
 
-    async def delete_by_id(self, obj_id: uuid.UUID) -> bool:
-        try:
-            query = select(self._model).filter(self._model.id == obj_id)
-            result = await self._db_session.execute(query)
-            obj_found: T | None = result.unique().scalar_one_or_none()
+    async def list_all(self) -> list[DomainEntity]:
+        query = select(self._model_cls)
+        result = await self._db_session.execute(query)
+        obj_sequence: Sequence[OrmModel] = result.scalars().all()
+        obj_list = [self._mapper.to_domain(obj) for obj in list(obj_sequence)]
+        return obj_list
 
-            if not obj_found:
-                return False
+    async def delete_by_id(self, obj_id: uuid.UUID) -> None:
+        query = select(self._model_cls).filter(self._model_cls.id == obj_id)
+        result = await self._db_session.execute(query)
+        obj_found: OrmModel | None = result.scalar_one_or_none()
 
-            await self._db_session.delete(obj_found)
-            await self._db_session.commit()
-            return True
-        except SQLAlchemyError as e:
-            await self._db_session.rollback()
-            raise e
+        if not obj_found:
+            raise NoResultFound(f'Registro com ID {obj_id} não encontrado.')
 
-    async def update(self, obj_id: uuid.UUID, obj_in: dict[str, Any]) -> T | None:
-        try:
-            query = select(self._model).filter(self._model.id == obj_id)
-            result = await self._db_session.execute(query)
-            obj_found: T | None = result.unique().scalar_one_or_none()
+        await self._db_session.delete(obj_found)
 
-            if not obj_found:
-                return None
+    async def update(self, domain_entity: DomainEntity) -> DomainEntity:
+        orm_model = self._mapper.to_model(domain_entity)
+        query = select(self._model_cls).filter(
+            self._model_cls.id == domain_entity.id)
+        result = await self._db_session.execute(query)
+        obj_found: OrmModel | None = result.scalar_one_or_none()
 
-            for key, value in obj_in.items():
-                setattr(obj_found, key, value)
+        if not obj_found:
+            raise NoResultFound(
+                f'Registro com ID {domain_entity.id} não encontrado.')
 
-            await self._db_session.commit()
-            await self._db_session.refresh(obj_found)
-            return obj_found
-        except SQLAlchemyError as e:
-            await self._db_session.rollback()
-            raise e
+        for column in self._model_cls.__table__.columns:
+            if column.name not in 'created_at, updated_at':
+                setattr(obj_found, column.name,
+                        getattr(orm_model, column.name))
+
+        await self._db_session.refresh(obj_found)
+        return self._mapper.to_domain(obj_found)
