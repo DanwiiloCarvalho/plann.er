@@ -2,10 +2,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from app.adapters.outbound.database.mappers.imapper import IMapper
 from app.adapters.outbound.database.models.base import Base
-from sqlalchemy.exc import NoResultFound
 from collections.abc import Sequence
 from abc import ABC
 import uuid
+
+from app.domain.exceptions.entity_not_found import EntityNotFoundError
 
 
 class BaseRepository[OrmModel: Base, DomainEntity](ABC):
@@ -44,7 +45,7 @@ class BaseRepository[OrmModel: Base, DomainEntity](ABC):
         obj_found: OrmModel | None = result.scalar_one_or_none()
 
         if not obj_found:
-            raise NoResultFound(f'Registro com ID {obj_id} não encontrado.')
+            raise EntityNotFoundError(obj_id)
 
         await self._db_session.delete(obj_found)
 
@@ -56,8 +57,7 @@ class BaseRepository[OrmModel: Base, DomainEntity](ABC):
         obj_found: OrmModel | None = result.scalar_one_or_none()
 
         if not obj_found:
-            raise NoResultFound(
-                f'Registro com ID {domain_entity.id} não encontrado.')
+            raise EntityNotFoundError(orm_model.id)
 
         for column in self._model_cls.__table__.columns:
             if column.name not in 'created_at, updated_at':
