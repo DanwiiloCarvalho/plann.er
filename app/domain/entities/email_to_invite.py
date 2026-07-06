@@ -1,11 +1,13 @@
 from uuid import UUID
 
+from app.domain.value_objects.email import Email
+
 
 class EmailToInvite:
     def __init__(
         self,
         id: UUID,
-        email: str,
+        email: Email,
         fullname: str,
         presence: bool,
         trip_id: UUID
@@ -20,16 +22,12 @@ class EmailToInvite:
     def id(self) -> UUID:
         return self.__id
 
-    @id.setter
-    def id(self, id: UUID) -> None:
-        self.__id = id
-
     @property
-    def email(self) -> str:
+    def email(self) -> Email:
         return self.__email
 
     @email.setter
-    def email(self, email: str) -> None:
+    def email(self, email: Email) -> None:
         self.__email = email
 
     @property
@@ -51,10 +49,6 @@ class EmailToInvite:
     @property
     def trip_id(self) -> UUID:
         return self.__trip_id
-
-    @trip_id.setter
-    def trip_id(self, trip_id: UUID) -> None:
-        self.__trip_id = trip_id
 
     def __repr__(self) -> str:
         return self.__email

@@ -3,6 +3,7 @@ from uuid import UUID
 from app.domain.entities.activity import Activity
 from app.domain.entities.link import Link
 from app.domain.entities.email_to_invite import EmailToInvite
+from app.domain.value_objects.email import Email
 
 
 class Trip:
@@ -13,7 +14,7 @@ class Trip:
         start_date: date,
         end_date: date,
         owner_name: str,
-        owner_email: str,
+        owner_email: Email,
         status: bool = False,
         activities: list[Activity] = [],
         links: list[Link] = [],
@@ -67,11 +68,11 @@ class Trip:
         self.__owner_name = owner_name
 
     @property
-    def owner_email(self) -> str:
+    def owner_email(self) -> Email:
         return self.__owner_email
 
     @owner_email.setter
-    def owner_email(self, owner_email: str) -> None:
+    def owner_email(self, owner_email: Email) -> None:
         self.__owner_email = owner_email
 
     @property
@@ -101,3 +102,7 @@ class Trip:
     @property
     def emails_to_invite(self) -> list[EmailToInvite]:
         return self.__emails_to_invite
+
+    @emails_to_invite.setter
+    def emails_to_invite(self, email_to_invite: EmailToInvite) -> None:
+        self.__emails_to_invite.append(email_to_invite)
