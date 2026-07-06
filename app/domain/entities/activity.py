@@ -3,7 +3,13 @@ from uuid import UUID
 
 
 class Activity:
-    def __init__(self, id: UUID, title: str, date: date, time: time, trip_id: UUID) -> None:
+    def __init__(
+        self, id: UUID,
+        title: str,
+        date: date,
+        time: time,
+        trip_id: UUID
+    ) -> None:
         self.__id = id
         self.__title = title
         self.__date = date
@@ -13,10 +19,6 @@ class Activity:
     @property
     def id(self) -> UUID:
         return self.__id
-
-    @id.setter
-    def id(self, id: UUID) -> None:
-        self.__id = id
 
     @property
     def title(self) -> str:
@@ -45,7 +47,3 @@ class Activity:
     @property
     def trip_id(self) -> UUID:
         return self.__trip_id
-
-    @trip_id.setter
-    def trip_id(self, trip_id: UUID) -> None:
-        self.__trip_id = trip_id
