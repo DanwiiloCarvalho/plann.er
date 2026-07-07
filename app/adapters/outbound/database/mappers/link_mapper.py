@@ -10,8 +10,7 @@ class LinkMapper(IMapper[LinkModel, LinkDomain]):
             id=model.id,
             link=model.link,
             title=model.title,
-            trip_id=model.trip_id,
-            created_at=model.created_at
+            trip_id=model.trip_id
         )
 
     @staticmethod
