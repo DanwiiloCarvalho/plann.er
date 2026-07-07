@@ -3,6 +3,8 @@ from uuid import UUID
 from app.domain.entities.activity import Activity
 from app.domain.entities.link import Link
 from app.domain.entities.email_to_invite import EmailToInvite
+from app.domain.exceptions.activity_outside_trip_dates_error import ActivityOutsideTripDatesError
+from app.domain.exceptions.unconfirmed_trip_error import UnconfirmedTripError
 from app.domain.value_objects.email import Email
 
 
@@ -89,6 +91,10 @@ class Trip:
 
     @activities.setter
     def activities(self, activity: Activity) -> None:
+        if not self.__status:
+            raise UnconfirmedTripError
+        if not (self.__start_date <= activity.date <= self.__end_date):
+            raise ActivityOutsideTripDatesError
         self.__activities.append(activity)
 
     @property
@@ -97,6 +103,8 @@ class Trip:
 
     @links.setter
     def links(self, link: Link) -> None:
+        if not self.__status:
+            raise UnconfirmedTripError
         self.__links.append(link)
 
     @property
