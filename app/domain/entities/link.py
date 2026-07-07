@@ -8,7 +8,7 @@ class Link:
         id: UUID,
         link: Link,
         title: str,
-        trip_id: UUID
+        trip_id: UUID = None
     ) -> None:
         self.__id = id
         self.__link = link
@@ -38,6 +38,10 @@ class Link:
     @property
     def trip_id(self) -> UUID:
         return self.__trip_id
+
+    @trip_id.setter
+    def trip_id(self, trip_id: UUID) -> None:
+        self.__trip_id = trip_id
 
     def __repr__(self) -> str:
         return self.link
