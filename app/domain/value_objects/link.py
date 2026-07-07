@@ -7,10 +7,10 @@ from app.domain.exceptions.netloc_not_found_error import NetlocNotFoundError
 
 @dataclass(frozen=True)
 class Link:
-    value: str
+    address: str
 
     def __post_init__(self):
-        parsed = urlparse(self.value)
+        parsed = urlparse(self.address)
         if parsed.scheme != 'https':
             raise InvalidUrlProtocolError
         if not parsed.netloc:
