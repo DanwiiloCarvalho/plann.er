@@ -106,6 +106,7 @@ class Trip:
     def links(self, link: Link) -> None:
         if not self.__status:
             raise UnconfirmedTripError
+        link.trip_id = self.__id
         self.__links.append(link)
 
     @property
