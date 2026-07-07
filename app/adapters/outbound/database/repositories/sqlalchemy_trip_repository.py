@@ -23,7 +23,8 @@ class SqlAlchemyTripRepository(TripRepository):
         return TripMapper.to_domain(trip_found)
 
     async def save(self, trip: TripDomain) -> None:
-        self.__db_session.add(TripMapper.to_model(trip))
+        trip_model = TripMapper.to_model(trip)
+        await self.__db_session.merge(trip_model)
 
     async def delete(self, trip: TripDomain) -> None:
         query = select(TripModel).filter(TripModel.id == trip.id)
