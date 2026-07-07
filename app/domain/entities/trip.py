@@ -95,6 +95,7 @@ class Trip:
             raise UnconfirmedTripError
         if not (self.__start_date <= activity.date <= self.__end_date):
             raise ActivityOutsideTripDatesError
+        activity.trip_id = self.__id
         self.__activities.append(activity)
 
     @property
