@@ -9,8 +9,8 @@ class EmailToInvite:
         id: UUID,
         email: Email,
         fullname: str,
-        presence: bool,
-        trip_id: UUID
+        trip_id: UUID | None = None,
+        presence: bool = False
     ) -> None:
         self.__id = id
         self.__email = email
@@ -49,6 +49,10 @@ class EmailToInvite:
     @property
     def trip_id(self) -> UUID:
         return self.__trip_id
+
+    @trip_id.setter
+    def trip_id(self, trip_id: UUID) -> None:
+        self.__trip_id = trip_id
 
     def __repr__(self) -> str:
         return self.__email
