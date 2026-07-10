@@ -115,4 +115,5 @@ class Trip:
 
     @emails_to_invite.setter
     def emails_to_invite(self, email_to_invite: EmailToInvite) -> None:
+        email_to_invite.trip_id = self.__id
         self.__emails_to_invite.append(email_to_invite)
