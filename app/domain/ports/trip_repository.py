@@ -6,13 +6,13 @@ from app.domain.entities.trip import Trip
 
 class TripRepository(ABC):
     @abstractmethod
-    def get_by_id(self, trip_id: UUID) -> Trip | None:
+    async def get_by_id(self, trip_id: UUID) -> Trip | None:
         pass
 
     @abstractmethod
-    def save(self, trip: Trip) -> None:
+    async def save(self, trip: Trip) -> None:
         pass
 
     @abstractmethod
-    def delete(self, trip: Trip) -> None:
+    async def delete(self, trip: Trip) -> None:
         pass
