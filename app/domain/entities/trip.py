@@ -4,6 +4,8 @@ from app.domain.entities.activity import Activity
 from app.domain.entities.link import Link
 from app.domain.entities.email_to_invite import EmailToInvite
 from app.domain.exceptions.activity_outside_trip_dates_error import ActivityOutsideTripDatesError
+from app.domain.exceptions.invalid_trip_dates_error import InvalidTripDatesError
+from app.domain.exceptions.trip_start_date_in_past_error import TripStartDateInPastError
 from app.domain.exceptions.unconfirmed_trip_error import UnconfirmedTripError
 from app.domain.value_objects.email import Email
 
@@ -22,6 +24,10 @@ class Trip:
         links: list[Link] = [],
         emails_to_invite: list[EmailToInvite] = []
     ) -> None:
+        if start_date < date.today():
+            raise TripStartDateInPastError
+        if end_date <= start_date:
+            raise InvalidTripDatesError
         self.__id = id
         self.__destination = destination
         self.__start_date = start_date
