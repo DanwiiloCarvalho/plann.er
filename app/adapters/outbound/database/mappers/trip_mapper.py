@@ -4,6 +4,7 @@ from app.adapters.outbound.database.mappers.imapper import IMapper
 from app.adapters.outbound.database.mappers.link_mapper import LinkMapper
 from app.adapters.outbound.database.models.trip import Trip as TripModel
 from app.domain.entities.trip import Trip as TripDomain
+from app.domain.value_objects.email import Email
 
 
 class TripMapper(IMapper[TripModel, TripDomain]):
@@ -15,7 +16,7 @@ class TripMapper(IMapper[TripModel, TripDomain]):
             start_date=model.start_date,
             end_date=model.end_date,
             owner_name=model.owner_name,
-            owner_email=model.owner_email,
+            owner_email=Email(model.owner_email),
             status=model.status,
             activities=[ActivityMapper.to_domain(
                 activity) for activity in model.activities],
@@ -32,7 +33,7 @@ class TripMapper(IMapper[TripModel, TripDomain]):
             start_date=domain.start_date,
             end_date=domain.end_date,
             owner_name=domain.owner_name,
-            owner_email=domain.owner_email,
+            owner_email=domain.owner_email.email,
             status=domain.status,
             activities=[ActivityMapper.to_model(
                 activity) for activity in domain.activities],  # Faltando funcionar
