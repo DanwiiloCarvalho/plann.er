@@ -10,12 +10,13 @@ from app.adapters.inbound.api.schemas.get_trip_response import GetTripResponse
 from app.adapters.outbound.database.repositories.sqlalchemy_trip_repository import SqlAlchemyTripRepository
 from app.application.dto.email_dto import EmailToInviteDTO
 from app.application.dto.trip_dto import CreateTripDTO
+from app.application.use_cases.confirm_trip_use_case import ConfirmTripUseCase
 from app.application.use_cases.create_trip_use_case import CreateTripUseCase
 from app.application.use_cases.get_trip_by_id_use_case import GetTripByIdUseCase
 from app.domain.exceptions.invalid_trip_dates_error import InvalidTripDatesError
+from app.domain.exceptions.trip_not_found_error import TripNotFoundError
 from app.domain.exceptions.trip_start_date_in_past_error import TripStartDateInPastError
 from app.infrastructure.sqlalchemy_unit_of_work import SqlAlchemyUnitOfWork
-from tests.conftest import db_session
 
 router = APIRouter()
 
@@ -64,3 +65,18 @@ async def get_trip_by_id(trip_id: uuid.UUID, db_session: AsyncSession = Depends(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail='Trip not found.')
     return GetTripResponse.model_validate(trip_found)
+
+
+@router.post(
+    '/{trip_id}/confirm',
+    status_code=status.HTTP_204_NO_CONTENT
+)
+async def confirm_trip(trip_id: uuid.UUID, db_session: AsyncSession = Depends(get_db)):
+    try:
+        trip_repo = SqlAlchemyTripRepository(db_session)
+        uow = SqlAlchemyUnitOfWork(db_session)
+        confirm_trip_use_case = ConfirmTripUseCase(trip_repo, uow)
+        await confirm_trip_use_case.execute(trip_id)
+    except TripNotFoundError as exception:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=str(exception))
