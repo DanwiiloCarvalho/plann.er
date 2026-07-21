@@ -5,3 +5,10 @@ from dataclasses import dataclass
 class EmailToInviteDTO:
     fullname: str
     email: str
+
+
+@dataclass
+class GetEmailToInviteDTO:
+    fullname: str
+    email: str
+    presence: bool
