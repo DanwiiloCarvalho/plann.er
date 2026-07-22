@@ -112,6 +112,9 @@ async def create_trip_link(trip_id: uuid.UUID, link: CreateLinkRequest, db_sessi
     except TripNotFoundError as exception:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail=str(exception))
+    except UnconfirmedTripError as exception:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail=str(exception))
 
 
 @router.post(
