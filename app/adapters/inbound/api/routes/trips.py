@@ -6,6 +6,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.adapters.inbound.api.deps import get_db
 from app.adapters.inbound.api.schemas.create_activity_request import CreateActivityRequest
 from app.adapters.inbound.api.schemas.create_activity_response import CreateActivityResponse
+from app.adapters.inbound.api.schemas.create_email_to_invite_request import CreateEmailToInviteRequest
+from app.adapters.inbound.api.schemas.create_email_to_invite_response import CreateEmailToInviteResponse
 from app.adapters.inbound.api.schemas.create_link_request import CreateLinkRequest
 from app.adapters.inbound.api.schemas.create_link_response import CreateLinkResponse
 from app.adapters.inbound.api.schemas.create_trip_request import CreateTripRequest
@@ -18,6 +20,7 @@ from app.application.dto.link_dto import LinkDTO
 from app.application.dto.trip_dto import CreateTripDTO
 from app.application.use_cases.confirm_trip_use_case import ConfirmTripUseCase
 from app.application.use_cases.create_activity_use_case import CreateActivityUseCase
+from app.application.use_cases.create_email_to_invite_use_case import CreateEmailToInviteUseCase
 from app.application.use_cases.create_trip_link_use_case import CreateTripLinkUseCase
 from app.application.use_cases.create_trip_use_case import CreateTripUseCase
 from app.application.use_cases.get_trip_by_id_use_case import GetTripByIdUseCase
@@ -133,3 +136,30 @@ async def create_trip_activity(trip_id: uuid.UUID, activity: CreateActivityReque
     except ActivityOutsideTripDatesError as exception:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(exception))
+
+
+@router.post(
+    '/{trip_id}/emails_to_invite',
+    description='Adiciona um e-mail de convite a uma viagem',
+    status_code=status.HTTP_201_CREATED,
+    response_model=CreateEmailToInviteResponse
+)
+async def create_email_to_invite(
+    trip_id: uuid.UUID,
+    email_to_invite: CreateEmailToInviteRequest,
+    db_session: AsyncSession = Depends(get_db)
+) -> CreateEmailToInviteResponse:
+    try:
+        trip_repo = SqlAlchemyTripRepository(db_session)
+        uow = SqlAlchemyUnitOfWork(db_session)
+        create_email_to_invite_use_case = CreateEmailToInviteUseCase(
+            trip_repo, uow)
+        email_created = await create_email_to_invite_use_case.execute(
+            trip_id,
+            EmailToInviteDTO(email_to_invite.fullname,
+                             str(email_to_invite.email))
+        )
+        return CreateEmailToInviteResponse.model_validate(email_created)
+    except TripNotFoundError as exception:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=str(exception))
