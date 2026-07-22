@@ -73,6 +73,7 @@ async def get_trip_by_id(trip_id: uuid.UUID, db_session: AsyncSession = Depends(
 
 @router.post(
     '/{trip_id}/confirm',
+    description='Confirma uma viagem',
     status_code=status.HTTP_204_NO_CONTENT
 )
 async def confirm_trip(trip_id: uuid.UUID, db_session: AsyncSession = Depends(get_db)) -> None:
