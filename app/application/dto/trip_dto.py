@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from datetime import date
 import uuid
 
+from app.application.dto.activity_dto import ActivityDTO
 from app.application.dto.email_dto import EmailToInviteDTO, GetEmailToInviteDTO
 from app.application.dto.link_dto import LinkDTO
 
@@ -16,6 +17,7 @@ class GetTripDTO:
     owner_email: str
     emails_to_invite: list[GetEmailToInviteDTO]
     links: list[LinkDTO]
+    activities: list[ActivityDTO]
 
 
 @dataclass
