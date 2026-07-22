@@ -89,6 +89,7 @@ async def confirm_trip(trip_id: uuid.UUID, db_session: AsyncSession = Depends(ge
 
 @router.post(
     '/{trip_id}/links',
+    description='Adiciona um link a uma viagem',
     status_code=status.HTTP_201_CREATED,
     response_model=CreateLinkResponse
 )
