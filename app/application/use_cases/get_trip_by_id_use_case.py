@@ -1,4 +1,5 @@
 import uuid
+from app.application.dto.activity_dto import ActivityDTO
 from app.application.dto.email_dto import GetEmailToInviteDTO
 from app.application.dto.link_dto import LinkDTO
 from app.application.dto.trip_dto import GetTripDTO
@@ -22,6 +23,9 @@ class GetTripByIdUseCase:
             links = [LinkDTO(link.link, link.title)
                      for link in trip_found.links]
 
+            activities = [ActivityDTO(activity.title, activity.date, activity.time)
+                          for activity in trip_found.activities]
+
             trip_found = GetTripDTO(
                 id=trip_found.id,
                 destination=trip_found.destination,
@@ -30,7 +34,8 @@ class GetTripByIdUseCase:
                 owner_name=trip_found.owner_name,
                 owner_email=trip_found.owner_email.email,
                 emails_to_invite=emails_to_invite,
-                links=links
+                links=links,
+                activities=activities
             )
 
         return trip_found
