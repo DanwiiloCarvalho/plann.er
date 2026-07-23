@@ -26,6 +26,7 @@ from app.application.use_cases.create_trip_use_case import CreateTripUseCase
 from app.application.use_cases.get_trip_by_id_use_case import GetTripByIdUseCase
 from app.domain.exceptions.activity_outside_trip_dates_error import ActivityOutsideTripDatesError
 from app.domain.exceptions.invalid_trip_dates_error import InvalidTripDatesError
+from app.domain.exceptions.invalid_url_protocol_error import InvalidUrlProtocolError
 from app.domain.exceptions.trip_not_found_error import TripNotFoundError
 from app.domain.exceptions.trip_start_date_in_past_error import TripStartDateInPastError
 from app.domain.exceptions.unconfirmed_trip_error import UnconfirmedTripError
@@ -112,7 +113,7 @@ async def create_trip_link(trip_id: uuid.UUID, link: CreateLinkRequest, db_sessi
     except TripNotFoundError as exception:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail=str(exception))
-    except UnconfirmedTripError as exception:
+    except (UnconfirmedTripError, InvalidUrlProtocolError) as exception:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT, detail=str(exception))
 
