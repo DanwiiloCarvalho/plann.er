@@ -11,7 +11,7 @@ class Link:
 
     def __post_init__(self):
         parsed = urlparse(self.address)
-        if parsed.scheme != 'https':
+        if parsed.scheme.lower() not in ('http', 'https'):
             raise InvalidUrlProtocolError
         if not parsed.netloc:
             raise NetlocNotFoundError
