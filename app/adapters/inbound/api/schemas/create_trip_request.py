@@ -5,7 +5,6 @@ from app.adapters.inbound.api.schemas.base_schema import BaseSchema
 
 
 class EmailToInviteRequest(BaseSchema):
-    fullname: str
     email_to_invite: EmailStr
 
 

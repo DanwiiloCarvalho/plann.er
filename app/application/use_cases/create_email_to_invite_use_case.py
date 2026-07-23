@@ -29,8 +29,7 @@ class CreateEmailToInviteUseCase:
 
             new_email_to_invite = EmailToInvite(
                 id=uuid.uuid1(),
-                email=Email(email_to_invite.email),
-                fullname=email_to_invite.fullname
+                email=Email(email_to_invite.email)
             )
 
             trip_found.emails_to_invite = new_email_to_invite
@@ -38,7 +37,6 @@ class CreateEmailToInviteUseCase:
 
             return EmailToInviteResponseDTO(
                 id=new_email_to_invite.id,
-                fullname=new_email_to_invite.fullname,
                 email=new_email_to_invite.email.email,
                 presence=new_email_to_invite.presence
             )

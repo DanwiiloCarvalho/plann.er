@@ -6,7 +6,7 @@ from app.adapters.inbound.api.schemas.base_schema import BaseSchema
 
 
 class GetEmailToInvite(BaseSchema):
-    fullname: str
+    fullname: str | None
     email: EmailStr
     presence: bool
 

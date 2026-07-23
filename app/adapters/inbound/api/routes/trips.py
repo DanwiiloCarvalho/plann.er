@@ -14,7 +14,7 @@ from app.adapters.inbound.api.schemas.create_trip_request import CreateTripReque
 from app.adapters.inbound.api.schemas.create_trip_response import CreateTripResponse
 from app.adapters.inbound.api.schemas.get_trip_response import GetTripResponse
 from app.adapters.outbound.database.repositories.sqlalchemy_trip_repository import SqlAlchemyTripRepository
-from app.application.dto.activity_dto import ActivityDTO, ActivityResponseDTO
+from app.application.dto.activity_dto import ActivityDTO
 from app.application.dto.email_dto import EmailToInviteDTO
 from app.application.dto.link_dto import LinkDTO
 from app.application.dto.trip_dto import CreateTripDTO
@@ -46,8 +46,8 @@ async def create_trip(new_trip: CreateTripRequest, db_session: AsyncSession = De
         trip_repo = SqlAlchemyTripRepository(db_session)
         uow = SqlAlchemyUnitOfWork(db_session)
         create_trip_use_case = CreateTripUseCase(trip_repo, uow)
-        emails_list = [EmailToInviteDTO(
-            email.fullname, email.email_to_invite) for email in new_trip.emails_to_invite]
+        emails_list = [EmailToInviteDTO(email=email.email_to_invite)
+                       for email in new_trip.emails_to_invite]
 
         new_trip_dto = CreateTripDTO(
             destination=new_trip.destination,
@@ -160,8 +160,7 @@ async def create_email_to_invite(
             trip_repo, uow)
         email_created = await create_email_to_invite_use_case.execute(
             trip_id,
-            EmailToInviteDTO(email_to_invite.fullname,
-                             str(email_to_invite.email))
+            EmailToInviteDTO(email=str(email_to_invite.email))
         )
         return CreateEmailToInviteResponse.model_validate(email_created)
     except TripNotFoundError as exception:

@@ -8,7 +8,7 @@ class EmailToInvite:
         self,
         id: UUID,
         email: Email,
-        fullname: str,
+        fullname: str | None = None,
         trip_id: UUID | None = None,
         presence: bool = False
     ) -> None:

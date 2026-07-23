@@ -19,7 +19,7 @@ class CreateTripUseCase:
     async def execute(self, trip_dto: CreateTripDTO) -> CreateTripOutputDTO:
         async with self.__uow:
             emails_to_invite = [EmailToInvite(id=uuid.uuid1(), email=Email(
-                email_dto.email), fullname=email_dto.fullname) for email_dto in trip_dto.emails_to_invite]
+                email_dto.email)) for email_dto in trip_dto.emails_to_invite]
             trip = Trip(
                 id=uuid.uuid1(),
                 destination=trip_dto.destination,
