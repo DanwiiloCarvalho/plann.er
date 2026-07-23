@@ -4,6 +4,7 @@ from app.domain.exceptions.trip_not_found_error import TripNotFoundError
 from app.domain.ports.trip_repository import TripRepository
 from app.domain.ports.unit_of_work import UnitOfWork
 from app.domain.entities.link import Link
+from app.domain.value_objects.link import Link as LinkValueObject
 
 
 class CreateTripLinkUseCase:
@@ -23,7 +24,7 @@ class CreateTripLinkUseCase:
 
             new_link = Link(
                 id=uuid.uuid1(),
-                link=link.link,
+                link=LinkValueObject(link.link).address,
                 title=link.title
             )
 
