@@ -4,6 +4,7 @@ from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.adapters.inbound.api.deps import get_db
+from app.adapters.inbound.api.schemas.confirm_participation_request import ConfirmParticipationRequest
 from app.adapters.inbound.api.schemas.create_activity_request import CreateActivityRequest
 from app.adapters.inbound.api.schemas.create_activity_response import CreateActivityResponse
 from app.adapters.inbound.api.schemas.create_email_to_invite_request import CreateEmailToInviteRequest
@@ -18,6 +19,7 @@ from app.application.dto.activity_dto import ActivityDTO
 from app.application.dto.email_dto import EmailToInviteDTO
 from app.application.dto.link_dto import LinkDTO
 from app.application.dto.trip_dto import CreateTripDTO
+from app.application.use_cases.confirm_participation_use_case import ConfirmParticipationUseCase
 from app.application.use_cases.confirm_trip_use_case import ConfirmTripUseCase
 from app.application.use_cases.create_activity_use_case import CreateActivityUseCase
 from app.application.use_cases.create_email_to_invite_use_case import CreateEmailToInviteUseCase
@@ -25,6 +27,8 @@ from app.application.use_cases.create_trip_link_use_case import CreateTripLinkUs
 from app.application.use_cases.create_trip_use_case import CreateTripUseCase
 from app.application.use_cases.get_trip_by_id_use_case import GetTripByIdUseCase
 from app.domain.exceptions.activity_outside_trip_dates_error import ActivityOutsideTripDatesError
+from app.domain.exceptions.email_to_invite_confirmed_error import EmailToInviteConfirmedError
+from app.domain.exceptions.email_to_invite_not_found_error import EmailToInviteNotFoundError
 from app.domain.exceptions.invalid_trip_dates_error import InvalidTripDatesError
 from app.domain.exceptions.invalid_url_protocol_error import InvalidUrlProtocolError
 from app.domain.exceptions.trip_not_found_error import TripNotFoundError
@@ -166,3 +170,28 @@ async def create_email_to_invite(
     except TripNotFoundError as exception:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail=str(exception))
+
+
+@router.post(
+    '/{trip_id}/emails_to_invite/{email_to_invite_id}/confirm',
+    description='Confirma a presença do convidado em uma viagem',
+    status_code=status.HTTP_204_NO_CONTENT
+)
+async def confirm_participation_in_the_trip(
+    trip_id: uuid.UUID,
+    email_to_invite_id: uuid.UUID,
+    confirmation_data: ConfirmParticipationRequest,
+    db_session: AsyncSession = Depends(get_db)
+) -> None:
+    try:
+        trip_repo = SqlAlchemyTripRepository(db_session)
+        uow = SqlAlchemyUnitOfWork(db_session)
+        confirm_participation_use_case = ConfirmParticipationUseCase(
+            trip_repo, uow)
+        await confirm_participation_use_case.execute(trip_id, email_to_invite_id, confirmation_data.fullname)
+    except (TripNotFoundError, EmailToInviteNotFoundError) as exception:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=str(exception))
+    except EmailToInviteConfirmedError as exception:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail=str(exception))

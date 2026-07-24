@@ -1,5 +1,6 @@
 from uuid import UUID
 
+from app.domain.exceptions.email_to_invite_confirmed_error import EmailToInviteConfirmedError
 from app.domain.value_objects.email import Email
 
 
@@ -53,6 +54,12 @@ class EmailToInvite:
     @trip_id.setter
     def trip_id(self, trip_id: UUID) -> None:
         self.__trip_id = trip_id
+
+    def confirm_participation(self, fullname: str) -> None:
+        if self.__presence:
+            raise EmailToInviteConfirmedError(self.__email.email)
+        self.__presence = True
+        self.__fullname = fullname
 
     def __repr__(self) -> str:
         return self.__email

@@ -1,9 +1,11 @@
 from datetime import date
 from uuid import UUID
+import uuid
 from app.domain.entities.activity import Activity
 from app.domain.entities.link import Link
 from app.domain.entities.email_to_invite import EmailToInvite
 from app.domain.exceptions.activity_outside_trip_dates_error import ActivityOutsideTripDatesError
+from app.domain.exceptions.email_to_invite_not_found_error import EmailToInviteNotFoundError
 from app.domain.exceptions.invalid_trip_dates_error import InvalidTripDatesError
 from app.domain.exceptions.unconfirmed_trip_error import UnconfirmedTripError
 from app.domain.value_objects.email import Email
@@ -120,3 +122,12 @@ class Trip:
     def emails_to_invite(self, email_to_invite: EmailToInvite) -> None:
         email_to_invite.trip_id = self.__id
         self.__emails_to_invite.append(email_to_invite)
+
+    def confirm_guest(self, email_to_invite_id: uuid.UUID, fullname: str) -> None:
+        email_found = self.__find_email_to_invite(email_to_invite_id)
+        if not email_found:
+            raise EmailToInviteNotFoundError(email_to_invite_id)
+        email_found.confirm_participation(fullname)
+
+    def __find_email_to_invite(self, email_to_invite_id: uuid.UUID) -> EmailToInvite | None:
+        return next((email for email in self.__emails_to_invite if email.id == email_to_invite_id), None)
