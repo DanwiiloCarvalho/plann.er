@@ -14,7 +14,7 @@ from app.adapters.inbound.api.schemas.create_link_response import CreateLinkResp
 from app.adapters.inbound.api.schemas.create_trip_request import CreateTripRequest
 from app.adapters.inbound.api.schemas.create_trip_response import CreateTripResponse
 from app.adapters.inbound.api.schemas.get_trip_response import GetTripResponse
-from app.adapters.inbound.api.schemas.get_email_to_invite_response import GetEmailToInviteListResponse
+from app.adapters.inbound.api.schemas.get_email_to_invite_response import GetEmailToInviteListResponse, GetEmailToInviteResponse
 from app.adapters.outbound.database.repositories.sqlalchemy_trip_repository import SqlAlchemyTripRepository
 from app.application.dto.activity_dto import ActivityDTO
 from app.application.dto.email_dto import EmailToInviteDTO
@@ -203,14 +203,16 @@ async def confirm_participation_in_the_trip(
     '/{trip_id}/emails_to_invite',
     description='Recupera os emails a serem convidados para uma viagem',
     status_code=status.HTTP_200_OK,
-    response_model=list[GetEmailToInviteListResponse]
+    response_model=GetEmailToInviteListResponse
 )
-async def get_emails_to_invite(trip_id: uuid.UUID, db_session: AsyncSession = Depends(get_db)) -> list[GetEmailToInviteListResponse]:
+async def get_emails_to_invite(trip_id: uuid.UUID, db_session: AsyncSession = Depends(get_db)) -> GetEmailToInviteListResponse:
     try:
         trip_repo = SqlAlchemyTripRepository(db_session)
         get_emails_to_invite_use_case = GetEmailsToInviteUseCase(trip_repo)
-        emails_to_invite = await get_emails_to_invite_use_case.execute(trip_id)
-        return [GetEmailToInviteListResponse.model_validate(email_to_invite) for email_to_invite in emails_to_invite]
+        emails_to_invite_dto = await get_emails_to_invite_use_case.execute(trip_id)
+        emails_to_invite = [GetEmailToInviteResponse.model_validate(
+            email_to_invite) for email_to_invite in emails_to_invite_dto]
+        return GetEmailToInviteListResponse(emails_to_invite=emails_to_invite)
     except TripNotFoundError as exception:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail=str(exception))
