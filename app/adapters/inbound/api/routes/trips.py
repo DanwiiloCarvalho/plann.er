@@ -14,6 +14,7 @@ from app.adapters.inbound.api.schemas.create_link_response import CreateLinkResp
 from app.adapters.inbound.api.schemas.create_trip_request import CreateTripRequest
 from app.adapters.inbound.api.schemas.create_trip_response import CreateTripResponse
 from app.adapters.inbound.api.schemas.get_trip_response import GetTripResponse
+from app.adapters.inbound.api.schemas.get_email_to_invite_response import GetEmailToInviteListResponse
 from app.adapters.outbound.database.repositories.sqlalchemy_trip_repository import SqlAlchemyTripRepository
 from app.application.dto.activity_dto import ActivityDTO
 from app.application.dto.email_dto import EmailToInviteDTO
@@ -26,6 +27,7 @@ from app.application.use_cases.create_email_to_invite_use_case import CreateEmai
 from app.application.use_cases.create_trip_link_use_case import CreateTripLinkUseCase
 from app.application.use_cases.create_trip_use_case import CreateTripUseCase
 from app.application.use_cases.get_trip_by_id_use_case import GetTripByIdUseCase
+from app.application.use_cases.get_emails_to_invite_use_case import GetEmailsToInviteUseCase
 from app.domain.exceptions.activity_outside_trip_dates_error import ActivityOutsideTripDatesError
 from app.domain.exceptions.email_to_invite_confirmed_error import EmailToInviteConfirmedError
 from app.domain.exceptions.email_to_invite_not_found_error import EmailToInviteNotFoundError
@@ -195,3 +197,20 @@ async def confirm_participation_in_the_trip(
     except EmailToInviteConfirmedError as exception:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT, detail=str(exception))
+
+
+@router.get(
+    '/{trip_id}/emails_to_invite',
+    description='Recupera os emails a serem convidados para uma viagem',
+    status_code=status.HTTP_200_OK,
+    response_model=list[GetEmailToInviteListResponse]
+)
+async def get_emails_to_invite(trip_id: uuid.UUID, db_session: AsyncSession = Depends(get_db)) -> list[GetEmailToInviteListResponse]:
+    try:
+        trip_repo = SqlAlchemyTripRepository(db_session)
+        get_emails_to_invite_use_case = GetEmailsToInviteUseCase(trip_repo)
+        emails_to_invite = await get_emails_to_invite_use_case.execute(trip_id)
+        return [GetEmailToInviteListResponse.model_validate(email_to_invite) for email_to_invite in emails_to_invite]
+    except TripNotFoundError as exception:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=str(exception))

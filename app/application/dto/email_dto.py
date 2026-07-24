@@ -15,6 +15,14 @@ class EmailToInviteResponseDTO:
 
 
 @dataclass
+class EmailToInviteListResponseDTO:
+    id: uuid.UUID
+    fullname: str
+    email: str
+    presence: bool
+
+
+@dataclass
 class GetEmailToInviteDTO:
     fullname: str
     email: str
