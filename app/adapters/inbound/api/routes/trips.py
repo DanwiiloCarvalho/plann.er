@@ -15,6 +15,7 @@ from app.adapters.inbound.api.schemas.create_trip_request import CreateTripReque
 from app.adapters.inbound.api.schemas.create_trip_response import CreateTripResponse
 from app.adapters.inbound.api.schemas.get_trip_response import GetTripResponse
 from app.adapters.inbound.api.schemas.get_email_to_invite_response import GetEmailToInviteListResponse, GetEmailToInviteResponse
+from app.adapters.inbound.api.schemas.get_activities_response import GetActivitiesListResponse, GetActivityResponse
 from app.adapters.outbound.database.repositories.sqlalchemy_trip_repository import SqlAlchemyTripRepository
 from app.application.dto.activity_dto import ActivityDTO
 from app.application.dto.email_dto import EmailToInviteDTO
@@ -28,6 +29,7 @@ from app.application.use_cases.create_trip_link_use_case import CreateTripLinkUs
 from app.application.use_cases.create_trip_use_case import CreateTripUseCase
 from app.application.use_cases.get_trip_by_id_use_case import GetTripByIdUseCase
 from app.application.use_cases.get_emails_to_invite_use_case import GetEmailsToInviteUseCase
+from app.application.use_cases.get_trip_activities_use_case import GetTripActivitiesUseCase
 from app.domain.exceptions.activity_outside_trip_dates_error import ActivityOutsideTripDatesError
 from app.domain.exceptions.email_to_invite_confirmed_error import EmailToInviteConfirmedError
 from app.domain.exceptions.email_to_invite_not_found_error import EmailToInviteNotFoundError
@@ -213,6 +215,25 @@ async def get_emails_to_invite(trip_id: uuid.UUID, db_session: AsyncSession = De
         emails_to_invite = [GetEmailToInviteResponse.model_validate(
             email_to_invite) for email_to_invite in emails_to_invite_dto]
         return GetEmailToInviteListResponse(emails_to_invite=emails_to_invite)
+    except TripNotFoundError as exception:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=str(exception))
+
+
+@router.get(
+    '/{trip_id}/activities',
+    description='Recupera atividades de uma viagem',
+    status_code=status.HTTP_200_OK,
+    response_model=GetActivitiesListResponse
+)
+async def get_trip_activities(trip_id: uuid.UUID, db_session: AsyncSession = Depends(get_db)) -> GetActivitiesListResponse:
+    try:
+        trip_repo = SqlAlchemyTripRepository(db_session)
+        get_trip_activities_use_case = GetTripActivitiesUseCase(trip_repo)
+        trip_activities_dto = await get_trip_activities_use_case.execute(trip_id)
+        trip_activities = [GetActivityResponse.model_validate(
+            activity) for activity in trip_activities_dto]
+        return GetActivitiesListResponse(activities=trip_activities)
     except TripNotFoundError as exception:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail=str(exception))
