@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, status
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.adapters.inbound.api.deps import get_db
+from app.adapters.inbound.api.deps import get_create_trip_use_case, get_db
 from app.adapters.inbound.api.schemas.confirm_participation_request import ConfirmParticipationRequest
 from app.adapters.inbound.api.schemas.create_activity_request import CreateActivityRequest
 from app.adapters.inbound.api.schemas.create_activity_response import CreateActivityResponse
@@ -38,6 +38,7 @@ from app.domain.exceptions.invalid_url_protocol_error import InvalidUrlProtocolE
 from app.domain.exceptions.trip_not_found_error import TripNotFoundError
 from app.domain.exceptions.trip_start_date_in_past_error import TripStartDateInPastError
 from app.domain.exceptions.unconfirmed_trip_error import UnconfirmedTripError
+from app.domain.ports.create_trip_port import CreateTripPort
 from app.infrastructure.sqlalchemy_unit_of_work import SqlAlchemyUnitOfWork
 
 router = APIRouter()
@@ -49,11 +50,9 @@ router = APIRouter()
     status_code=status.HTTP_201_CREATED,
     response_model=CreateTripResponse
 )
-async def create_trip(new_trip: CreateTripRequest, db_session: AsyncSession = Depends(get_db)) -> CreateTripResponse:
+async def create_trip(new_trip: CreateTripRequest, create_trip_use_case: CreateTripPort = Depends(get_create_trip_use_case)) -> CreateTripResponse:
     try:
-        trip_repo = SqlAlchemyTripRepository(db_session)
-        uow = SqlAlchemyUnitOfWork(db_session)
-        create_trip_use_case = CreateTripUseCase(trip_repo, uow)
+
         emails_list = [EmailToInviteDTO(email=email.email_to_invite)
                        for email in new_trip.emails_to_invite]
 

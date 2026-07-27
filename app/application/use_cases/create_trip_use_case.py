@@ -2,19 +2,25 @@ import uuid
 from app.application.dto.trip_dto import CreateTripDTO, CreateTripOutputDTO
 from app.domain.entities.email_to_invite import EmailToInvite
 from app.domain.entities.trip import Trip
+from app.domain.ports.create_trip_port import CreateTripPort
+from app.domain.ports.notification_sender import NotificationSender
 from app.domain.ports.trip_repository import TripRepository
 from app.domain.ports.unit_of_work import UnitOfWork
 from app.domain.value_objects.email import Email
 
 
-class CreateTripUseCase:
+class CreateTripUseCase(CreateTripPort):
     def __init__(
         self,
         trip_repo: TripRepository,
-        uow: UnitOfWork
+        uow: UnitOfWork,
+        notification_sender: NotificationSender,
+        email_message: str
     ) -> None:
         self.__trip_repo = trip_repo
         self.__uow = uow
+        self.__notification_sender = notification_sender
+        self.__email_message = email_message
 
     async def execute(self, trip_dto: CreateTripDTO) -> CreateTripOutputDTO:
         async with self.__uow:
@@ -31,6 +37,9 @@ class CreateTripUseCase:
             )
 
             await self.__trip_repo.save(trip)
+            self.__notification_sender.send_notification(
+                [trip.owner_email.email], self.__email_message + f'/{trip.id}/confirm')
+
             return CreateTripOutputDTO(
                 id=trip.id,
                 destination=trip.destination,
