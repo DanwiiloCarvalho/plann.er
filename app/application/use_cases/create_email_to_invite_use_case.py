@@ -3,8 +3,8 @@ import uuid
 from app.application.dto.email_dto import EmailToInviteDTO, EmailToInviteResponseDTO
 from app.domain.entities.email_to_invite import EmailToInvite
 from app.domain.exceptions.trip_not_found_error import TripNotFoundError
-from app.domain.ports.trip_repository import TripRepository
-from app.domain.ports.unit_of_work import UnitOfWork
+from app.domain.ports.output_ports.trip_repository import TripRepository
+from app.domain.ports.output_ports.unit_of_work import UnitOfWork
 from app.domain.value_objects.email import Email
 
 

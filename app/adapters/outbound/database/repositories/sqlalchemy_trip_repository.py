@@ -5,7 +5,7 @@ from app.adapters.outbound.database.mappers.trip_mapper import TripMapper
 from app.adapters.outbound.database.models.trip import Trip as TripModel
 from app.domain.entities.trip import Trip as TripDomain
 from app.domain.exceptions.trip_not_found_error import TripNotFoundError
-from app.domain.ports.trip_repository import TripRepository
+from app.domain.ports.output_ports.trip_repository import TripRepository
 
 
 class SqlAlchemyTripRepository(TripRepository):

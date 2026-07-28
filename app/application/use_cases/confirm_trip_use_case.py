@@ -1,8 +1,8 @@
 import uuid
 from app.domain.exceptions.trip_not_found_error import TripNotFoundError
-from app.domain.ports.notification_sender import NotificationSender
-from app.domain.ports.trip_repository import TripRepository
-from app.domain.ports.unit_of_work import UnitOfWork
+from app.domain.ports.output_ports.notification_sender import NotificationSender
+from app.domain.ports.output_ports.trip_repository import TripRepository
+from app.domain.ports.output_ports.unit_of_work import UnitOfWork
 
 
 class ConfirmTripUseCase:

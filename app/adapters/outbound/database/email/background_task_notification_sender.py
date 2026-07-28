@@ -1,6 +1,6 @@
 import uuid
 from app.adapters.outbound.database.email.smtp_email_sender import SMTPEmailSender
-from app.domain.ports.notification_sender import NotificationSender
+from app.domain.ports.output_ports.notification_sender import NotificationSender
 from fastapi import BackgroundTasks
 
 

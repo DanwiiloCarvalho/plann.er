@@ -2,10 +2,10 @@ import uuid
 from app.application.dto.trip_dto import CreateTripDTO, CreateTripOutputDTO
 from app.domain.entities.email_to_invite import EmailToInvite
 from app.domain.entities.trip import Trip
-from app.domain.ports.create_trip_port import CreateTripPort
-from app.domain.ports.notification_sender import NotificationSender
-from app.domain.ports.trip_repository import TripRepository
-from app.domain.ports.unit_of_work import UnitOfWork
+from app.domain.ports.input_ports.create_trip_port import CreateTripPort
+from app.domain.ports.output_ports.notification_sender import NotificationSender
+from app.domain.ports.output_ports.trip_repository import TripRepository
+from app.domain.ports.output_ports.unit_of_work import UnitOfWork
 from app.domain.value_objects.email import Email
 
 
