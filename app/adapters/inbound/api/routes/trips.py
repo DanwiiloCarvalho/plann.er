@@ -38,8 +38,8 @@ from app.domain.exceptions.invalid_url_protocol_error import InvalidUrlProtocolE
 from app.domain.exceptions.trip_not_found_error import TripNotFoundError
 from app.domain.exceptions.trip_start_date_in_past_error import TripStartDateInPastError
 from app.domain.exceptions.unconfirmed_trip_error import UnconfirmedTripError
-from app.domain.ports.confirm_trip_port import ConfirmTripPort
-from app.domain.ports.create_trip_port import CreateTripPort
+from app.domain.ports.input_ports.confirm_trip_port import ConfirmTripPort
+from app.domain.ports.input_ports.create_trip_port import CreateTripPort
 from app.infrastructure.sqlalchemy_unit_of_work import SqlAlchemyUnitOfWork
 
 router = APIRouter()
