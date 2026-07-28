@@ -6,8 +6,8 @@ from app.adapters.outbound.database.email.smtp_email_sender import SMTPEmailSend
 from app.adapters.outbound.database.repositories.sqlalchemy_trip_repository import SqlAlchemyTripRepository
 from app.application.use_cases.confirm_trip_use_case import ConfirmTripUseCase
 from app.application.use_cases.create_trip_use_case import CreateTripUseCase
-from app.domain.ports.confirm_trip_port import ConfirmTripPort
-from app.domain.ports.create_trip_port import CreateTripPort
+from app.domain.ports.input_ports.confirm_trip_port import ConfirmTripPort
+from app.domain.ports.input_ports.create_trip_port import CreateTripPort
 from app.infrastructure.config import settings
 from app.infrastructure.database import Session
 from app.infrastructure.sqlalchemy_unit_of_work import SqlAlchemyUnitOfWork
