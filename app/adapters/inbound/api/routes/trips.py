@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, status
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.adapters.inbound.api.deps import get_create_trip_use_case, get_db
+from app.adapters.inbound.api.deps import get_confirm_trip_use_case, get_create_trip_use_case, get_db
 from app.adapters.inbound.api.schemas.confirm_participation_request import ConfirmParticipationRequest
 from app.adapters.inbound.api.schemas.create_activity_request import CreateActivityRequest
 from app.adapters.inbound.api.schemas.create_activity_response import CreateActivityResponse
@@ -38,6 +38,7 @@ from app.domain.exceptions.invalid_url_protocol_error import InvalidUrlProtocolE
 from app.domain.exceptions.trip_not_found_error import TripNotFoundError
 from app.domain.exceptions.trip_start_date_in_past_error import TripStartDateInPastError
 from app.domain.exceptions.unconfirmed_trip_error import UnconfirmedTripError
+from app.domain.ports.confirm_trip_port import ConfirmTripPort
 from app.domain.ports.create_trip_port import CreateTripPort
 from app.infrastructure.sqlalchemy_unit_of_work import SqlAlchemyUnitOfWork
 
@@ -93,11 +94,8 @@ async def get_trip_by_id(trip_id: uuid.UUID, db_session: AsyncSession = Depends(
     description='Confirma uma viagem',
     status_code=status.HTTP_204_NO_CONTENT
 )
-async def confirm_trip(trip_id: uuid.UUID, db_session: AsyncSession = Depends(get_db)) -> None:
+async def confirm_trip(trip_id: uuid.UUID, confirm_trip_use_case: ConfirmTripPort = Depends(get_confirm_trip_use_case)) -> None:
     try:
-        trip_repo = SqlAlchemyTripRepository(db_session)
-        uow = SqlAlchemyUnitOfWork(db_session)
-        confirm_trip_use_case = ConfirmTripUseCase(trip_repo, uow)
         await confirm_trip_use_case.execute(trip_id)
     except TripNotFoundError as exception:
         raise HTTPException(
