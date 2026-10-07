@@ -42,17 +42,18 @@ def run_migrations_offline() -> None:
 
     """
 
-    database_url = str(settings.DATABASE_URL)
-    if not database_url:
+    if not settings.DATABASE_URL:
         raise ValueError('DATABASE_URL is not defined')
+
+    database_url = str(settings.DATABASE_URL)
 
     if '+asyncpg' in database_url:
         database_url = database_url.replace('+asyncpg', '+psycopg2')
 
-    url = config.set_main_option("sqlalchemy.url", database_url)
+    config.set_main_option("sqlalchemy.url", database_url)
 
     context.configure(
-        url=url,
+        url=database_url,
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
@@ -70,9 +71,10 @@ def run_migrations_online() -> None:
 
     """
 
-    database_url = str(settings.DATABASE_URL)
-    if not database_url:
+    if not settings.DATABASE_URL:
         raise ValueError('DATABASE_URL is not defined')
+
+    database_url = str(settings.DATABASE_URL)
 
     if '+asyncpg' in database_url:
         database_url = database_url.replace('+asyncpg', '+psycopg2')
