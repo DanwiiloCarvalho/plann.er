@@ -6,7 +6,11 @@
 	"service": "app",
 	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
 	"features": {
-		"ghcr.io/devcontainers/features/git:1": {}
+		"ghcr.io/devcontainers/features/git:1": {},
+		"ghcr.io/jsburckhardt/devcontainer-features/opencode:1": {},
+		"ghcr.io/devcontainers/features/node:2": {
+			"version": "24.21.0"
+		}
 	},
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
